@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<head>
+	<script src="https://d3js.org/d3-array.v1.min.js"></script>
+	<script src="https://d3js.org/d3-geo.v1.min.js"></script>
+	<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+	<script src="all_nodes_info.js"></script>
+</head>
+<body>
+	<canvas id="myCanvas" width="960" height="500" style="border:1px solid #000000;">
+	</canvas>
+	<script>
+		function draw_line(){
+			var distance = Math.sqrt((s__[0]-end[0])*(s__[0]-end[0])+(s__[1]-end[1])*(s__[1]-end[1]));
+			if (distance<1){
+				console.log("done");
+				clearInterval(id);
+				callback();
+			}
+			else{
+				ctx.beginPath();
+				ctx.moveTo(s_[0],s_[1]);
+				ctx.lineTo(s__[0],s__[1]);
+				ctx.stroke();
+				s_ = s__.slice();
+				temp0 = ((end[0]-s__[0])/distance)*0.8;
+				temp1 = ((end[1]-s__[1])/distance)*0.8;
+				s__[0] = s__[0]+temp0;
+				s__[1] = s__[1]+temp1;
+			}
+		}
+		var a_center = [53.676414, 10.237885];
+		var scale = 0.01;
+		var left = a_center[1]-0.5*scale;
+		var right = a_center[1]+0.5*scale;
+		var low = a_center[0]-(500/960)*0.5*scale;
+		var up = a_center[0]+(500/960)*0.5*scale;
+		//console.log(left+' '+right+' '+low+' '+up);
+
+		var projection  = d3.geoMercator().center([10.237885,53.676414]).scale(4000000);
+		var c = document.getElementById("myCanvas");
+		var ctx = c.getContext("2d");
+	
+		console.log(Object.keys(all_points).length+" points");
+
+		var next;
+		var temp = Object.keys(all_points);
+		for (var k in temp){
+			temp_ = all_points[temp[k]];
+			p = projection([temp_[1],temp_[0]]);
+			if (p[0]>0 && p[0]<900 && p[1]>0 && p[1]<500){
+				next = temp[k];
+				break;
+			}
+		}
+		var queue = [];
+		var visited = {};
+		queue.push(next);
+		visited[next]=1;
+		
+		var s_;
+		var s__;
+		var end;
+		var id;
+		var callback;
+		add_neighbor = function(n, neighbors, ind){
+			console.log(neighbors.length+" neighbors");
+			console.log("now at "+ind);
+			if (!(neighbors[ind] in visited))
+			{
+				e = all_points[neighbors[ind]];
+				end = projection([e[1],e[0]]);
+				var s = all_points[n];
+				s = projection([s[1],s[0]]);
+				if (end[0]>0 && end[0]<960 && end[1]>0 && end[1]<500 && s[0]>0 && s[0]<960 && s[1]>0 && s[1]<500){
+					visited[neighbors[ind]]=true;
+					queue.push(neighbors[ind]);
+					s_ = s.slice();
+					s__ = s.slice();
+					if (ind<neighbors.length-1){
+						console.log("another after this");
+						console.log("was called with "+ind);
+						console.log("start: "+s);
+						console.log("end: "+end);
+						callback = function(){ add_neighbor(n,neighbors,ind+1)};
+						id = setInterval(draw_line, 10);
+					} else{
+						console.log("next node now");
+						callback = function(){next_node()};
+						id = setInterval(draw_line,10);
+					}
+				} else{
+					if (ind<neighbors.length-1)
+						add_neighbor(n, neighbors, ind+1);
+					else
+						next_node();
+					}
+			} else{
+				if (ind<neighbors.length-1)
+					add_neighbor(n, neighbors, ind+1);
+				else
+					next_node();
+			}
+		}
+
+		find_next_node = function(){
+			for (var k in temp){
+				temp_ = all_points[temp[k]];
+				p = projection([temp_[1],temp_[0]]);
+				if (p[0]>0 && p[0]<900 && p[1]>0 && p[1]<500){
+					if (!(temp[k] in visited)){
+						queue.push(temp[k]);
+						break;
+					}
+				}
+			}
+		}
+
+		var cnt_ = 0;
+		next_node = function(){
+			console.log("next_node");
+			if (!queue.length==0){
+				var n = queue.shift();
+				console.log(n);
+				var neighbors = all_nodes_next_nodes[n];
+				add_neighbor(n, neighbors, 0);
+			}else{
+				cnt_+=1;
+				console.log(cnt_);
+				find_next_node();
+				next_node();
+			}
+		}
+
+		next_node();
+	</script>
+</body>
