@@ -1,2 +1,5 @@
+<<<<<<< HEAD
 more to come
+=======
+>>>>>>> 5679620fb5743028466732a7559f0157b7d12971
 http://en.cppreference.com/w/cpp/language/implicit_conversion
