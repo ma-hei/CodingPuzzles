@@ -1,0 +1,2 @@
+more to come
+http://en.cppreference.com/w/cpp/language/implicit_conversion
