@@ -1,7 +1,40 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <algorithm>
+
 using namespace std;
+
+vector<vector<int> > get_all_inds(int n, int p){
+  
+}
+
+
+int find_range_in_row(vector<pair<int,int> >& intervals, pair<int,int>& range){
+  for (int i=0;i<intervals.size();i++){
+    if ((range.second>=intervals[i].first && range.second<=intervals[i].second) || (range.first>=intervals[i].first && range.first<=intervals[i].second)){
+      return i;
+    }
+  }
+  return -1;
+}
+
+bool find_range_in_remaining_rows(vector<vector<pair<int,int> > >& intervals, pair<int,int> &range){
+  for (int i=1;i<intervals.size();i++){
+    if (find_range_in_row(intervals[i], range)==-1){
+      return false;
+    }
+  }
+  return true;
+}
+
+void remove_range_in_remaining_rows(vector<vector<pair<int,int> > >&intervals, pair<int,int> &range){
+ for (int i=1;i<intervals.size();i++){
+    int temp = find_range_in_row(intervals[i], range);
+    intervals[i][temp] = pair<int,int>(-1,-1);
+  }
+
+}
 
 void calc_intervals(vector<vector<pair<int, int> > >& intervals, vector<vector<int> > Q, int* R){
 	int n = Q.size();
@@ -49,10 +82,12 @@ int main(){
 			for (int p_=0;p_<p;p_++){
 				cin>>Q[n_][p_];	
 			}
+            sort(Q[n_].begin(), Q[n_].end());
 		}
 		vector<vector<pair<int, int> > > intervals(n, vector<pair<int,int> >(p,pair<int,int>(-1,-1))); 	
 		calc_intervals(intervals, Q, R);
 
+<<<<<<< HEAD
 //		for (int n_=0;n_<n;n_++){
 //			for (int p_=0;p_<p;p_++){
 //				cout<<intervals[n_][p_].first<<" : "<<intervals[n_][p_].second<<"\n";
@@ -89,5 +124,30 @@ int main(){
 		}
 		cout<<"Case #"<<t_+1<<": "<<max_cnt<<"\n";
 //		cout<<"\n";
+=======
+        int count=0;
+        //for (int p_=0;p_<p;p_++){
+        //  if(intervals[0][p_].first!=-1 && find_range_in_remaining_rows(intervals, intervals[0][p_])){
+        //    remove_range_in_remaining_rows(intervals, intervals[0][p_]);
+        //    intervals[0][p_]=pair<int,int>(-1,-1); 
+        //    count++;
+        //  }
+        //}
+        
+        //for (int n_=0;n_<n;n_++){
+        //  for (int p_=0;p_<p;p_++){
+        //    cout<<"["<<intervals[n_][p_].first<<", "<<intervals[n_][p_].second<<"] ";
+        //  }
+        //  cout<<"\n";
+        //}
+        
+        if (n==1){
+
+        } else {
+
+        }
+
+		cout<<"Case #"<<t_+1<<": "<<count<<"\n";
+>>>>>>> some stuff
 	}
 }
