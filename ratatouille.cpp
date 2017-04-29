@@ -23,7 +23,34 @@ void calc_intervals(vector<vector<pair<int, int> > >& intervals, vector<vector<i
 
 }
 
+int row_has(vector<pair<int, int> >& intervals, pair<int,int> &interval){
+	int p = intervals.size();
+	for (int p_=0;p_<p;p_++){
+		if ((interval.first>=intervals[p_].first && interval.first<=intervals[p_].second) || (interval.second>=intervals[p_].first && interval.second<=intervals[p_].second)){
+			return p_;
+		}
+	}
+	return -1;	
+}
 
+bool remaining_rows_have(vector<vector<pair<int, int> > >& intervals, pair<int,int>& interval){
+
+	int n = intervals.size();
+	for (int n_=1;n_<n; n_++){
+		if (row_has(intervals[n_], interval)==-1){
+			return false;
+		}
+	}
+	return true;
+}	
+
+void remove_from_rows(vector<vector<pair<int,int> > >& intervals, pair<int,int>& interval){
+	int n = intervals.size();
+	for (int n_=1;n_<n;n_++){
+		int temp = row_has(intervals[n_], interval);
+		intervals[n_][temp] = pair<int,int>(-1,-1);
+	}
+}
 
 int main(){
 	
@@ -38,6 +65,7 @@ int main(){
 	int t;
 	cin>>t;
 	for (int t_=0;t_<t;t_++){
+		cout<<t_<<"\n";
 		int n,p;
 		cin>>n>>p;
 		int* R = new int[n];
@@ -49,45 +77,20 @@ int main(){
 			for (int p_=0;p_<p;p_++){
 				cin>>Q[n_][p_];	
 			}
+			sort(Q[n_].begin(), Q[n_].end());
 		}
 		vector<vector<pair<int, int> > > intervals(n, vector<pair<int,int> >(p,pair<int,int>(-1,-1))); 	
 		calc_intervals(intervals, Q, R);
 
-//		for (int n_=0;n_<n;n_++){
-//			for (int p_=0;p_<p;p_++){
-//				cout<<intervals[n_][p_].first<<" : "<<intervals[n_][p_].second<<"\n";
-//			}
-//			cout<<"\n";
-//		}
-		
-		int max_cnt=0;
-		if (n==1){
-			for (int p_=0;p_<p;p_++){
-				if (intervals[0][p_].first!=-1){
-					max_cnt++;
-				}
-			}
-		} else {
-			int* myints = new int[p];
-			for (int p_=0;p_<p;p_++){
-				myints[p_] = p_;
-			}
-			do{
-				int cnt = 0;
-				//for (int p_=0;p_<p;p_++){
-				//	cout<<myints[p_]<<" ";
-				//}
-				for (int p_=0;p_<p;p_++){
-					pair<int,int> int1 = intervals[0][p_];
-					pair<int,int> int2 = intervals[1][myints[p_]];
-					if (int1.first!=-1 && ((int1.first>=int2.first && int1.first<=int2.second) || (int1.second>=int2.first && int1.second<=int2.second))){
-						cnt++;
-					}
-				}
-				max_cnt = max(max_cnt, cnt);
-			}while(next_permutation(myints, myints+p));
+		int cnt=0;
+		for (int p_=0;p_<p;p_++){
+			if (intervals[0][p_].first!=-1 && remaining_rows_have(intervals, intervals[0][p_])){
+				remove_from_rows(intervals, intervals[0][p_]);
+				intervals[0][p_] = pair<int,int>(-1,-1);
+				cnt++;
+			}	
 		}
-		cout<<"Case #"<<t_+1<<": "<<max_cnt<<"\n";
-//		cout<<"\n";
+
+		cout<<"Case #"<<t_+1<<": "<<cnt<<"\n";
 	}
 }
