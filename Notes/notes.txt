@@ -1,0 +1,7 @@
+how can I run my cpp code on the console from vim?
+how do I pass arrays to a function by reference again?
+and how do I pass an array to a function by value again?
+how do I rename a file that I have open in vim?
+how do I create c++ arrays of dynamic size again?
+how to does pointer arithmetic work again?
+buy a nice alarm clock.
