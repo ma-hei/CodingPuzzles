@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://d3js.org/d3-array.v1.min.js"></script>
+		<script src="https://d3js.org/d3-geo.v1.min.js"></script>
+		<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	</head>
+	<body>
+	<canvas id="myCanvas" width="960" height="500" style="border:1px solid #000000;"></canvas>
+	<script>
+		var all_points = {};
+		var all_nodes_next_nodes = {};
+		var count = 1;
+		var id;
+
+		function draw_line(from, to, callback_func){	
+			ctx.beginPath();
+			ctx.moveTo(from[0], from[1]);
+			ctx.lineTo(to[0], to[1]);
+			ctx.stroke();
+			//callback_func();
+			setTimeout(function(){callback_func()}, 10);
+		}
+
+		var projection  = d3.geoMercator().center([10.237885,53.676414]).scale(2000000);
+		var c = document.getElementById("myCanvas");
+		var ctx = c.getContext("2d");
+		
+		find_node_in_bounding_box = function(width, height){
+			for (var i=0;i<n;i++){
+				if(!(ids[i] in visited) && ids[i] in all_nodes_next_nodes){
+					//console.log(ids[i]);
+					coords = all_points[ids[i]];
+					//console.log(coords);
+					p = projection([coords[1], coords[0]]);	
+					//console.log(p);
+					if (p[0]>0 && p[0]<width && p[1]>0 && p[1]<height){
+						return ids[i];
+					}	
+				}
+			}
+		}	
+		var visited = {};	
+		queue = [];
+
+		is_in_box = function(point,width, height){
+			console.log("checking "+point);
+			coords = all_points[point];
+			proj = projection([coords[1], coords[0]]);
+			console.log("projection of point "+proj);
+			if(proj[0]>0 && proj[0]<width && proj[1]>0 && proj[1]<height){
+				return true;
+			}
+			return false;
+		}
+
+		push_neighbors_to_queue = function(neighbors){
+			for (var i=0;i<neighbors.length;i++){
+				if (!(neighbors[i] in visited) && neighbors[i] in all_nodes_next_nodes){
+					console.log("pushing neighbor "+i+" ("+neighbors[i]+")");
+					visited[neighbors[i]] = 1;
+					if (is_in_box(neighbors[i], 960, 500)){
+						console.log("pushed.. ");
+						queue.push(neighbors[i]);
+					}else{
+						console.log("not in box..");
+					}
+				} else{
+					console.log("neighbor "+neighbors[i]+" not pushed because already visited");
+				}
+			}
+		}
+
+		draw_neighbors = function(n, neighbors, index){
+
+			n_coords = all_points[n];
+			n_projection = projection([n_coords[1], n_coords[0]]);
+			if (index<neighbors.length){
+				console.log("drawing neighbor "+index);
+				neighbor = neighbors[index];
+				neighbor_coords = all_points[neighbor];
+				neighbor_projection = projection([neighbor_coords[1], neighbor_coords[0]]);
+				console.log("drawing line from "+n_projection+" to "+neighbor_projection);
+				draw_line(n_projection, neighbor_projection, function(){ draw_neighbors(n, neighbors, index+1)});
+			} else{
+				push_neighbors_to_queue(neighbors);
+				bfs_();
+			}	
+		}
+
+		bfs_  = function(){
+			if(queue.length>0){
+				var n = queue.shift();
+				console.log("processing "+n);
+				neighbors = all_nodes_next_nodes[n]; 	
+				console.log("neighbors "+neighbors);
+				draw_neighbors(n, neighbors, 0);	
+			}else{
+				bfs();
+			}
+		}
+
+		var not_drawing = true;
+		bfs = function(){
+			start_node = find_node_in_bounding_box(960, 500);
+			if(typeof start_node!=='undefined'){
+				console.log("starting new bfs with "+start_node);	
+				visited[start_node] = 1;
+				queue.push(start_node);
+				bfs_();
+			} else{
+				console.log("no more nodes found");
+				not_drawing = true;
+			}
+		}
+
+
+		var counter = 0;
+		var ids;
+		var n;
+
+		for (var i=0;i<1127;i++){
+			$.getScript("node_info/"+"nodes_"+i+".js", function(data, textStatus, jqxhr){
+						counter+=1;
+						console.log(counter);
+						ids = Object.keys(all_points);
+						n = ids.length;
+						if (counter==1 || not_drawing){
+							not_drawing = false;
+							console.log(n+" points found");
+							bfs();
+						}
+			});
+		}
+	</script>
+	</body>
+</html>
