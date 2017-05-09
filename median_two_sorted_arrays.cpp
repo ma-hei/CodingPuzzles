@@ -19,21 +19,17 @@ int find(int n, int m, int* arr_n, int* arr_m, int l_n, int r_n, int l_m, int r_
   int middle_elem_n = arr_n[middle_idx_n];
   int middle_elem_m = arr_m[middle_idx_m];
   int sum = middle_idx_n - l_n + middle_idx_m - l_m + 2;
-  //cout<<l_n<<" "<<r_n<<" "<<l_m<<" "<<r_m<<" "<<sum<<" "<<x<<"\n";
-  //cout<<middle_idx_n<<" "<<middle_idx_m<<"\n\n";
-  //char c;
-  //cin>>c;
   if (x <= sum){
     if (middle_elem_n <= middle_elem_m){
-      find(n,m,arr_n,arr_m,l_n,r_n,l_m,middle_idx_m,x);
+      return find(n,m,arr_n,arr_m,l_n,r_n,l_m,middle_idx_m,x);
     } else {
-      find(n,m,arr_n,arr_m,l_n,middle_idx_n,l_m,r_m,x);
+      return find(n,m,arr_n,arr_m,l_n,middle_idx_n,l_m,r_m,x);
     }
   } else {
     if (middle_elem_n <= middle_elem_m){
-      find(n,m,arr_n,arr_m,middle_idx_n+1,r_n,l_m,r_m,x-(middle_idx_n-l_n+1));
+      return find(n,m,arr_n,arr_m,middle_idx_n+1,r_n,l_m,r_m,x-(middle_idx_n-l_n+1));
     } else {
-      find(n,m,arr_n,arr_m,l_n,r_n,middle_idx_m+1,r_m,x-(middle_idx_m-l_m+1));
+      return find(n,m,arr_n,arr_m,l_n,r_n,middle_idx_m+1,r_m,x-(middle_idx_m-l_m+1));
     }
   }
 }
