@@ -29,5 +29,25 @@ int main(){
 				v[v.size()-1].first++;
 			}	
 		}
+		if (!v[0].second){
+			v.push_front(0,true);
+		}	
+		int p1 = 0;
+		int p2 = 0;
+		int sum = 0;
+		while(p2<v.size()){
+			if (v[p1].second && v[p2].second && left>=0){
+					int padding_left = p1==0 ? 0 : v[p1-1].first;
+					int padding_right = p2<n-1 ? v[p2+1].first : 0;
+					p2++;
+			} else if (v[p2].second && left <0){
+				if (v[p1].second){
+					sum-=v[p1].first;
+				} else {
+					left+=v[p1].first;
+				}
+				p1++;
+			} 
+		}
 	}
 }
