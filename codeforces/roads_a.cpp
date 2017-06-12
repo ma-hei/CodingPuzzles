@@ -3,6 +3,7 @@
 using namespace std;
 
 int main(){
+<<<<<<< HEAD
   int n;
   cin>>n;
   int* arr = new int[n];
@@ -33,12 +34,7 @@ int main(){
 	long long forward_2 = i>=e && i<=b ? left*(i-e+1) : 0;
 	long long forward_3 = i>b ? (i-e+1)*(n-1-i) : 0;
 	long long backward_2 = i>b ? e*(i-b) : 0;
-	//cout<<"coming through: "<<forward_1<<" "<<forward_2<<" "<<forward_3<<" "<<backward_1<<" "<<backward_2<<"\n";
 	res+=(long long)arr[i]*(forward_1+forward_2+forward_3+backward_1+backward_2);
   }
   long long last_one=e>0 ? e*left :0;
-  //cout<<last_one<<"\n";
-  res+=last_one*arr[n-1];
-  cout<<res<<"\n";
 }
-
